@@ -9,9 +9,13 @@
 
 import { copyFileSync, mkdirSync, openSync, readFileSync, readSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { crc32 } from "node:zlib";
 
-const SOURCE = "entry.png";
+// resolve beside this file, never against the working directory: the grader runs
+// `node /bot/main.ts` and does not promise what the cwd is
+const HERE = fileURLToPath(new URL(".", import.meta.url));
+const SOURCE = join(HERE, "entry.png");
 const MAX_BYTES = 1048576;
 const SIDE = 1024;
 
@@ -59,7 +63,7 @@ function inspect(path: string): number {
   return bytes.length;
 }
 
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "out";
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? join(HERE, "out");
 const destination = join(outDir, "entry.png");
 const size = inspect(SOURCE);
 mkdirSync(outDir, { recursive: true });
